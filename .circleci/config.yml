@@ -2,10 +2,13 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.0.1
+  #snyk: snyk/snyk@1.5.0
+  docker: circleci/docker@2.6.0
 
 executor: docker/docker
 
 jobs:
+
   build:
     docker:
       - image: cimg/node:16.10
@@ -28,6 +31,25 @@ jobs:
           echo "Running tests..."
           npm run test
 
+  build-and-push:
+    docker:
+      - image: cimg/node:16.10
+        auth:
+          username: $DOCKERHUB_USERNAME # can specify string literal values
+          password: $DOCKERHUB_PASSWORD  # or project environment variable 
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t $DOCKERHUB_USERNAME/assignment-node-app .
+      - run:
+          name: Push application Docker image
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            docker push $DOCKERHUB_USERNAME/assignment-node-app
+
 workflows:
   simple_workflow:
     jobs:
@@ -35,3 +57,7 @@ workflows:
       - test:
           requires:
             - build
+  
+  build_push_workflow:
+    jobs:
+      - build-and-push
