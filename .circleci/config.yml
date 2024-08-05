@@ -34,6 +34,9 @@ jobs:
   build-and-push:
     docker:
       - image: cimg/node:16.10
+        auth:
+          username: stefanokali # can specify string literal values
+          password: $DOCKERHUB_PASSWORD  # or project environment variable 
     steps:
       - checkout
       - docker/check
