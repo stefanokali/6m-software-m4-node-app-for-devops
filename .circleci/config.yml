@@ -2,10 +2,12 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.0.1
+  snyk: snyk/snyk@1.5.0
 
 executor: docker/docker
 
 jobs:
+
   build:
     docker:
       - image: cimg/node:16.10
@@ -28,6 +30,17 @@ jobs:
           echo "Running tests..."
           npm run test
 
+    build-and-push:
+      docker:
+        - image: cimg/node:16.10
+      steps:
+        - checkout
+        - docker/check
+        - docker/build:
+          image: stefanokali/my-app
+        - docker/push:
+          image: stefanokali/my-app
+
 workflows:
   simple_workflow:
     jobs:
@@ -35,3 +48,7 @@ workflows:
       - test:
           requires:
             - build
+  
+  build_push_workflow:
+    jobs:
+      - build-and-push
