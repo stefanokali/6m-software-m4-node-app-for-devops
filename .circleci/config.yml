@@ -30,15 +30,15 @@ jobs:
           echo "Running tests..."
           npm run test
 
-    build-and-push:
-      docker:
-        - image: cimg/node:16.10
-      steps:
-        - checkout
-        - docker/check
-        - docker/build:
+  build-and-push:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - checkout
+      - docker/check
+      - docker/build:
           image: stefanokali/my-app
-        - docker/push:
+      - docker/push:
           image: stefanokali/my-app
 
 workflows:
