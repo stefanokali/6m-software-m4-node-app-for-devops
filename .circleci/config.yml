@@ -35,15 +35,21 @@ jobs:
     docker:
       - image: cimg/node:16.10
         auth:
-          username: stefanokali # can specify string literal values
-          password: DOCKERHUB_PASSWORD  # or project environment variable 
+          username: $DOCKERHUB_USERNAME # can specify string literal values
+          password: $DOCKERHUB_PASSWORD  # or project environment variable 
     steps:
       - checkout
+      - setup_remote_docker
       - docker/check
-      - docker/build:
-          image: stefanokali/my-app
-      - docker/push:
-          image: stefanokali/my-app
+      - run:
+          name: Build Docker image
+          command:
+            docker build -t $DOCKERHUB_USERNAME/assignment-node-app .
+      - run:
+          name: Push application Docker image
+          command:
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            docker push $DOCKERHUB_USERNAME/assignment-node-app
 
 workflows:
   simple_workflow:
